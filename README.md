@@ -4,11 +4,11 @@ This is data and code for ProbeFuse submited to ICSE-2027
 
 
 ## Instructions
-This is the experimental process code and data of the proposed method Coding-Fuse and FMF method, which can be found in the code directory.
+This is the experimental process code and data of the proposed method ProbeFuse.
 
-If you need to repeat the performance values ​​of the experimental results, we recommend running the test code directly, in each setcode parameter --test part. But before that, you need to (1) first copy the dataset folder to the directory at the same level as code in each fusion folder. (2) Secondly, import the code pre-trained models in the code folder, and we have prepared the file name for you, prepared code PTMs can be found at https://zenodo.org/records/15543665 (3) Finally, you need to import our trained test model (can be found at https://zenodo.org/records/15543870, https://zenodo.org/records/15544997 and https://zenodo.org/records/15546108) in saved_models in the code folder. You can get the same performance values ​​as us.
+If you want to check the result obtained in the paper, we also provide the data, code, results, models and running log in total of 88GB zip file of our experiments, which is the same folder name in the Zenodo as this repository. 
 
-If you need to perform the entire experiment, that is, the entire process from training to testing, we recommend that you directly execute all the commands of setcode, but before that you also need to perform the first two steps above.
+If you need to repeat the performance values ​​of the experimental results and further design, we recommend running the code according to the next guidance.
 
 ## Preliminary Study
 ### Probe Datasets and Tasks
