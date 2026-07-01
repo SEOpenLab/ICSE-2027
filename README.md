@@ -32,34 +32,124 @@ We input the results obtained above into the INPUT PROBE RESULTS section of the 
    ```   
 Then we get 18 code functional modules, each code PTM have three code modules.
 
-
 ### RQ1
+For RQ1, in the RQ1 folder, there are two task folders, and each task has two subfolders: one for the original model training and fine-tuning, and the other for the training and fine-tuning in modular fusion. These modules come from three different functional modules of the same model. Simply execute the instructions in the setcode file to run the experiment. For example, 
 
+   ```  
+python run.py \
+    --output_dir=./saved_models \
+    --model_type=roberta \
+    --tokenizer_name=./codebert-base \
+    --model_name_or_path=./codebert-base \
+    --do_train \
+    --train_data_file=../dataset/train.jsonl \
+    --eval_data_file=../dataset/valid.jsonl \
+    --test_data_file=../dataset/test.jsonl \
+    --epoch 100 \
+    --early_stopping_patience 10 \
+    --block_size 50 \
+    --train_batch_size 16 \
+    --eval_batch_size 64 \
+    --learning_rate 5e-5 \
+    --max_grad_norm 1.0 \
+    --evaluate_during_training \
+    --seed 123456  2>&1 | tee train.log && python run.py \
+    --output_dir=./saved_models \
+    --model_type=roberta \
+    --tokenizer_name=./codebert-base \
+    --model_name_or_path=./codebert-base \
+    --do_eval \
+    --do_test \
+    --train_data_file=../dataset/train.jsonl \
+    --eval_data_file=../dataset/valid.jsonl \
+    --test_data_file=../dataset/test.jsonl \
+    --epoch 100 \
+    --early_stopping_patience 10 \
+    --block_size 50 \
+    --train_batch_size 16 \
+    --eval_batch_size 64 \
+    --learning_rate 5e-5 \
+    --max_grad_norm 1.0 \
+    --evaluate_during_training \
+    --seed 123456 2>&1 | tee test.log && python ../evaluator/evaluator.py -a ../dataset/test.jsonl -p saved_models/predictions.txt
+   ```
+It is worth noting that in order to ensure the fairness of the experiment, we used the same training strategy, random seed, training and testing batches, and other parameters, which were not mentioned in the paper.
 
 ### RQ2
+For RQ2, in the RQ2 folder, there are also two task folders, and each task has 16 subfolders. Each folder represents a module combination. Due to the large number of combinations, we only conducted experiments on a small subset of functional module combinations to verify the feasibility of the scheme. For each folder, executing the instructions in the setcode file will run the training and testing strategy for each combination. For example, 
+
+   ```  
+python run.py \
+    --output_dir=./saved_models \
+    --model_type=roberta \
+    --tokenizer_name=./codebert-base \
+    --model_name_or_path=./codebert-base \
+    --do_train \
+    --train_data_file=../dataset/train.jsonl \
+    --eval_data_file=../dataset/valid.jsonl \
+    --test_data_file=../dataset/test.jsonl \
+    --epoch 100 \
+    --early_stopping_patience 10 \
+    --block_size 50 \
+    --train_batch_size 16 \
+    --eval_batch_size 64 \
+    --learning_rate 5e-5 \
+    --max_grad_norm 1.0 \
+    --evaluate_during_training \
+    --seed 123456  2>&1 | tee train.log && python run.py \
+    --output_dir=./saved_models \
+    --model_type=roberta \
+    --tokenizer_name=./codebert-base \
+    --model_name_or_path=./codebert-base \
+    --do_eval \
+    --do_test \
+    --train_data_file=../dataset/train.jsonl \
+    --eval_data_file=../dataset/valid.jsonl \
+    --test_data_file=../dataset/test.jsonl \
+    --epoch 100 \
+    --early_stopping_patience 10 \
+    --block_size 50 \
+    --train_batch_size 16 \
+    --eval_batch_size 64 \
+    --learning_rate 5e-5 \
+    --max_grad_norm 1.0 \
+    --evaluate_during_training \
+    --seed 123456 2>&1 | tee test.log && python ../evaluator/evaluator.py -a ../dataset/test.jsonl -p saved_models/predictions.txt
+   ```
+Note that the parameter settings here are the same as in RQ1, and the parameter settings are also the same for different combinations. This controls these variables to evaluate only the effectiveness of the functional module combination scheme.
+
+## GA Search-RQ3+RQ4
+The GA code is located in the RQ3+RQ4 folder, which contains two sub-files corresponding to the GA code for the two tasks. The parameters during the GA search process are defined in the code, and the training and testing parameters after finding the optimal module combination are the same as those for RQ1 and RQ2 to ensure a fair performance comparison.
+
+To perform the best functional module search and subsequent training/testing for code clone detection task, execute the commands in the `setcode` folder within this directory. For example,
+
+   ```
+python run.py \
+    --output_dir=./saved_models \
+    --model_type=roberta \
+    --config_name=./codebert-base \
+    --model_name_or_path=./codebert-base \
+    --tokenizer_name=roberta-base \
+    --do_GA \
+    --do_train \
+    --do_eval \
+    --do_test \
+    --train_data_file=../dataset/train.txt \
+    --eval_data_file=../dataset/valid.txt \
+    --test_data_file=../dataset/test.txt \
+    --epoch 100 \
+    --block_size 400 \
+    --train_batch_size 16 \
+    --eval_batch_size 32 \
+    --learning_rate 5e-5 \
+    --max_grad_norm 1.0 \
+    --evaluate_during_training \
+    --seed 123456 2>&1| tee GA.log && python ../evaluator/evaluator.py -a ../dataset/test.txt -p saved_models/predictions.txt
+   ```
 
 
-
-## GA Search 
-
-
-
-## Details
-### Dataset Partition
-code clone detection: Train-901028, Valid-415416, Test-415416
-
-technical debt detection: Train-23012, Valid-7674, Test-7674
-
-
-
-
-### Finetune 
-
+### Finetune details
 For code clone detection, use 10% Train and 10% Valid for fine-tuning, for code smell detection and technical debt detection, use full Train and Valid for fine-tuning.
-
-### Hyperparameters
-The training and testing commands and hyperparameters can be found in the setcode files in each folder. Training hyperparameters such as learning rate, batch size, and random seed are aligned with FMF and OSM in the same task and scenario to ensure fair and optimal comparisons.
-
 
 If you have any questions, you can leave a message.
 
